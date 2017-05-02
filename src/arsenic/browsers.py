@@ -13,3 +13,9 @@ class Firefox(Browser):
         'marionette': True,
         'acceptInsecureCerts': True,
     }
+
+
+class Chrome(Browser):
+    defaults = {
+        'browserName': 'chrome',
+    }

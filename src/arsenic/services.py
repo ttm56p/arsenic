@@ -9,6 +9,39 @@ from arsenic.utils import free_port
 from arsenic.webdriver import WebDriver
 
 
+async def start_local_service(engine, port, cmd, log_file):
+    closers = []
+    try:
+        process = await engine.start_process(
+            cmd,
+            os.environ,
+            log_file
+        )
+        closers.append(process.close)
+        service_url = f'http://localhost:{port}'
+        session = await engine.http_session()
+        closers.append(session.close)
+        request = Request(
+            url=service_url + '/status',
+            method='GET'
+        )
+        count = 0
+        while True:
+            try:
+                await session.request(request)
+                break
+            except Exception as exc:
+                count += 1
+                if count > 30:
+                    raise Exception('not starting?')
+                await engine.sleep(0.5)
+        return WebDriver(engine, Connection(session, service_url), closers)
+    except Exception as exc:
+        for closer in reversed(closers):
+            await closer()
+        raise
+
+
 @attr.s
 class ServiceContext:
     service = attr.ib()
@@ -36,39 +69,31 @@ class Service(metaclass=abc.ABCMeta):
 @attr.s
 class Geckodriver(Service):
     log_file = attr.ib(default=os.devnull)
+    arguments = attr.ib(default=attr.Factory(list))
 
     async def start(self, engine):
         port = str(free_port())
-        closers = []
-        try:
-            process = await engine.start_process(
-                ['geckodriver', '--port', port],
-                os.environ,
-                self.log_file
-            )
-            closers.append(process.close)
-            service_url = f'http://localhost:{port}'
-            session = await engine.http_session()
-            closers.append(session.close)
-            request = Request(
-                url=service_url + '/status',
-                method='GET'
-            )
-            count = 0
-            while True:
-                try:
-                    await session.request(request)
-                    break
-                except:
-                    count += 1
-                    if count > 30:
-                        raise Exception('not starting?')
-                    await engine.sleep(0.5)
-            return WebDriver(engine, Connection(session, service_url), closers)
-        except:
-            for closer in reversed(closers):
-                await closer()
-            raise
+        return await start_local_service(
+            engine,
+            port,
+            ['geckodriver', '--port', port] + self.arguments,
+            self.log_file
+        )
+
+
+@attr.s
+class Chromedriver(Service):
+    log_file = attr.ib(default=os.devnull)
+    arguments = attr.ib(default=attr.Factory(list))
+
+    async def start(self, engine):
+        port = str(free_port())
+        return await start_local_service(
+            engine,
+            port,
+            ['chromedriver', '--port=' + port] + self.arguments,
+            self.log_file
+        )
 
 
 @attr.s

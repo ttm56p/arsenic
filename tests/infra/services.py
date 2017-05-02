@@ -4,8 +4,8 @@ from urllib.parse import urlparse, parse_qsl, urlunparse
 import attr
 import shutil
 
-from arsenic.browsers import Firefox
-from arsenic.services import Geckodriver, Remote
+from arsenic.browsers import Firefox, Chrome
+from arsenic.services import Geckodriver, Chromedriver, Remote
 
 
 BROWSERS = {
@@ -28,6 +28,14 @@ if shutil.which('geckodriver'):
         driver=Geckodriver(),
         browser=Firefox(),
         name='geckofirefox'
+    ))
+
+
+if shutil.which('chromedriver'):
+    SERVICE_CONTEXTS.append(ServiceContext(
+        driver=Chromedriver(),
+        browser=Chrome(),
+        name='chromechrome',
     ))
 
 

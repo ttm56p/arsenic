@@ -52,6 +52,8 @@ class Connection:
                 'error': '!internal',
                 'message': str(exc)
             }
+        if response.status == 404:
+            raise errors.ArsenicError('resource not found')
         errors.check_response(data)
         if raw:
             return data
