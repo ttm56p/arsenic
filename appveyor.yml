@@ -2,9 +2,10 @@ build: false
 environment:
   SPHINXBUILD: "C:\\Python36-x64\\Scripts\\sphinx-build.exe"
 install:
-  - "C:\\Python36-x64\\Scripts\\pip.exe install . -r tests\\requirements.txt"
-  - "C:\\Python36-x64\\Scripts\\arsenic-configure-ie11.exe"
+  - "C:\\Python36-x64\\Scripts\\pip.exe install poetry"
+  - "C:\\Python36-x64\\Scripts\\poetry.exe develop"
+  - "C:\\Python36-x64\\Scripts\\poetry.exe run arsenic-configure-ie11"
 test_script:
-  - "C:\\Python36-x64\\Scripts\\arsenic-check-ie11.exe"
-  - "C:\\Python36-x64\\Scripts\\pytest.exe --verbose tests"
+  - "C:\\Python36-x64\\Scripts\\poetry.exe run arsenic-check-ie11"
+  - "C:\\Python36-x64\\Scripts\\poetry.exe run pytest --verbose tests"
 
