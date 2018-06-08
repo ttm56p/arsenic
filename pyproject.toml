@@ -6,10 +6,10 @@ authors = ["Jonas Obrist <jonas.obrist@hde.co.jp>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = ">=3.6"
-attrs = ">=17.1.0"
+python = "^3.6"
+attrs = "^17.1.0"
 structlog = "^18.1"
-aiohttp = ">=2"
+aiohttp = "^2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.5"
@@ -25,3 +25,6 @@ black = "^18.3-alpha.0"
 [tool.poetry.scripts]
 arsenic-check-ie11 = 'arsenic.helpers:check_ie11_environment_cli'
 arsenic-configure-ie11 = 'arsenic.helpers:configure_ie11_environment_cli'
+
+[tool.pytest]
+testpaths = tests
