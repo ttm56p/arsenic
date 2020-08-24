@@ -80,15 +80,18 @@ class Connection:
 
     @ensure_task
     async def request(self, *, url: str, method: str, data=None) -> Tuple[int, Any]:
+        body = data
         if data is None:
-            data = {}
+            body = {}
         if method not in {"POST", "PUT"}:
-            data = None
-        body = json.dumps(data) if data is not None else None
+            body = None
+        extra = dict()
+        if data is not None:
+            extra['json'] = body
         full_url = self.prefix + url
         log.info("request", url=strip_auth(full_url), method=method, body=body)
         async with self.session.request(
-            url=full_url, method=method, data=body
+            url=full_url, method=method, **extra
         ) as response:
             response_body = await response.read()
             try:
